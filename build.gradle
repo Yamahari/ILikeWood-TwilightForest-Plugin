@@ -1,0 +1,162 @@
+buildscript {
+    repositories {
+        // These repositories are only for Gradle plugins, put any other repositories in the repository block further below
+        maven { url = 'https://maven.minecraftforge.net' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+    }
+}
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'maven-publish'
+apply plugin: 'java'
+
+version = "${version_mc}-${version_major}.${version_minor}.${version_patch}"
+group = 'yamahari.ilikewoodxtwilightforest' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = 'ilikewoodxtwilightforest'
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+repositories {
+    flatDir {
+        dir 'build/libs'
+    }
+    maven {
+        // location of the maven that hosts JEI files
+        name = "Progwml6 maven"
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        // location of a maven mirror for JEI files, as a fallback
+        name = "ModMaven"
+        url = "https://modmaven.k-4u.nl"
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+        resources {
+            srcDirs = ['src/main/resources', 'src/data/resources/data', 'src/data/resources/textures']
+        }
+    }
+}
+
+def replaceVersions = tasks.register('replaceVersions', Copy) {
+    it.outputs.upToDateWhen { false }
+    it.from(sourceSets.main.resources) {
+        include 'META-INF/mods.toml'
+        expand 'version': version,
+                'version_range_mc': version_range_mc,
+                'version_range_loader':  version_range_loader,
+                'version_range_forge': version_range_forge,
+                'version_range_ilw': version_range_ilw,
+                'version_range_twilightforest': version_range_twilightforest
+    }
+    it.into "$buildDir/resources/main/"
+}
+
+processResources {
+    copy {
+        from 'src/data/resources/assets/ilikewood/lang'
+        into 'src/data/resources/assets/ilikewoodxbyg/lang'
+    }
+    delete 'src/data/resources/assets/ilikewood/lang'
+    exclude 'META-INF/mods.toml'
+    configure {
+        finalizedBy replaceVersions
+    }
+}
+
+classes.configure {
+    dependsOn(replaceVersions)
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${version_mc}-${version_forge}"
+
+    compileOnly fg.deobf("build.libs:ilikewood:${version_mc}-${version_ilw}:api")
+    runtimeOnly fg.deobf("build.libs:ilikewood:${version_mc}-${version_ilw}")
+
+    runtimeOnly fg.deobf("build.libs:twilightforest:1.19-${version_twilightforest}-universal")
+    runtimeOnly fg.deobf("mezz.jei:jei-${version_mc}-forge:${version_jei}")
+}
+
+minecraft {
+    mappings channel: 'official', version: "${version_mc}"
+    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+    
+    // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
+            mods {
+                ilikewoodxbyg {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
+            mods {
+                ilikewoodxbyg {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        data {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+            property 'ilikewood.datagen.modid', 'twilightforest'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
+            args '--mod', 'ilikewood',
+                    '--all',
+                    '--output', file('src/data/resources/ilikewood_resources'),
+                    '--existing', file('src/main/resources/'),
+                    '--existing-mod', 'ilikewood',
+                    '--existing-mod', 'twilightforest'
+            mods {
+                ilikewoodxbyg {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+jar {
+    sourceSets.main.resources {
+        exclude '.cache'
+    }
+    manifest {
+        attributes([
+            "Specification-Title": "ilikewoodxtwilightforest",
+            "Specification-Vendor": "yamahari",
+            "Specification-Version": "${project.version}",
+            "Implementation-Title": "ilikewoodxtwilightforest",
+            "Implementation-Version": "${project.version}",
+            "Implementation-Vendor" :"yamahari",
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            "Automatic-Module-Name": "ilikewoodxtwilightforest"
+        ])
+    }
+    finalizedBy 'reobfJar'
+}

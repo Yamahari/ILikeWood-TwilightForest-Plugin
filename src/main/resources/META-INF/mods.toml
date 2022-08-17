@@ -1,0 +1,44 @@
+modLoader = "javafml" #mandatory
+loaderVersion = "${version_range_loader}"
+license = "MIT"
+issueTrackerURL = "https://github.com/Yamahari/ILikeWood-TwilightForest-Plugin/issues" #optional
+
+[[mods]] #mandatory
+modId = "ilikewoodxtwilightforest" #mandatory
+version = "${version}" #mandatory
+displayName = "I Like Wood - Twilight Forest Plugin" #mandatory
+displayURL = "https://www.curseforge.com/minecraft/mc-mods/i-like-wood-twilight-forest-plugin" #optional
+logoFile = "logo.png" #optional
+credits = "Yamahari and the people of Forge" #optional
+authors = "Yamahari" #optional
+description = '''
+Adds Twilight Forest support for I Like Wood.
+'''
+
+[[dependencies.ilikewoodxtwilightforest]]
+modId = "forge"
+mandatory = true
+versionRange = "${version_range_forge}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.ilikewoodxtwilightforest]]
+modId = "minecraft"
+mandatory = true
+versionRange = "${version_range_mc}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.ilikewoodxtwilightforest]]
+modId = "ilikewood"
+mandatory = true
+versionRange = "${version_range_ilw}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.ilikewoodxtwilightforest]]
+modId = "twilightforest"
+mandatory = true
+versionRange = "${version_range_twilightforest}"
+ordering = "NONE"
+side = "BOTH"

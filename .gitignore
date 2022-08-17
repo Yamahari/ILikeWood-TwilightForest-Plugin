@@ -1,0 +1,43 @@
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+build
+.gradle
+
+# other
+eclipse
+run
+
+# Files from Forge MDK
+forge*changelog.txt
+/src/generated/
+/logs/
+/src/main/resources/assets/biomesoplenty/
+/src/main/resources/.cache/
+/src/main/resources/assets/byg/
+/src/main/resources/assets/byg/blockstates/
+/src/main/resources/assets/byg/lang/
+/src/main/resources/assets/byg/models/
+/src/main/resources/assets/byg/particles/
+/src/main/resources/assets/byg/sounds/
+/src/main/resources/assets/byg/textures/
+/src/main/resources/assets/byg/logo_text.png
+/src/main/resources/assets/byg/sounds.json
+/src/data/resources/.cache/
+/src/data/resources/assets/
+/src/data/resources/data/
+/src/data/resources/ilikewood_resources/
+/src/data/resources/textures/
