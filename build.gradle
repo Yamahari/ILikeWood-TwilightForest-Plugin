@@ -1,22 +1,12 @@
-buildscript {
-    repositories {
-        // These repositories are only for Gradle plugins, put any other repositories in the repository block further below
-        maven { url = 'https://maven.minecraftforge.net' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-    }
+plugins {
+    id 'java'
+    id 'idea'
+    id 'net.minecraftforge.gradle' version '[6.0, 6.2)'
 }
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'maven-publish'
-apply plugin: 'java'
 
 version = "${version_mc}-${version_major}.${version_minor}.${version_patch}"
-group = 'yamahari.ilikewoodxtwilightforest' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'ilikewoodxtwilightforest'
+group = "yamahari.${mod_id}"
+archivesBaseName = "${mod_id}"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
@@ -51,7 +41,8 @@ def replaceVersions = tasks.register('replaceVersions', Copy) {
     it.outputs.upToDateWhen { false }
     it.from(sourceSets.main.resources) {
         include 'META-INF/mods.toml'
-        expand 'version': version,
+        expand 'mod_id': mod_id,
+                'version': version,
                 'version_range_mc': version_range_mc,
                 'version_range_loader':  version_range_loader,
                 'version_range_forge': version_range_forge,
@@ -83,7 +74,7 @@ dependencies {
     compileOnly fg.deobf("build.libs:ilikewood:${version_mc}-${version_ilw}:api")
     runtimeOnly fg.deobf("build.libs:ilikewood:${version_mc}-${version_ilw}")
 
-    runtimeOnly fg.deobf("build.libs:twilightforest:1.19-${version_twilightforest}-universal")
+    runtimeOnly fg.deobf("build.libs:twilightforest:${version_mc}-${version_twilightforest}-universal")
     runtimeOnly fg.deobf("mezz.jei:jei-${version_mc}-forge:${version_jei}")
 }
 
@@ -148,14 +139,14 @@ jar {
     }
     manifest {
         attributes([
-            "Specification-Title": "ilikewoodxtwilightforest",
+            "Specification-Title": "${mod_id}",
             "Specification-Vendor": "yamahari",
             "Specification-Version": "${project.version}",
-            "Implementation-Title": "ilikewoodxtwilightforest",
+            "Implementation-Title": "${mod_id}",
             "Implementation-Version": "${project.version}",
             "Implementation-Vendor" :"yamahari",
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            "Automatic-Module-Name": "ilikewoodxtwilightforest"
+            "Automatic-Module-Name": "${mod_id}"
         ])
     }
     finalizedBy 'reobfJar'
